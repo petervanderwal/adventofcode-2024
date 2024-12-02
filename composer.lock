@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "90cc2e1a142b086adfa059a7953010dc",
+    "content-hash": "53ed9a9df39e775cbaef44c952b18df9",
     "packages": [
         {
             "name": "nette/safe",
@@ -71,16 +71,16 @@
         },
         {
             "name": "petervanderwal/adventofcode-cli",
-            "version": "v1.0.1",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/petervanderwal/adventofcode-cli.git",
-                "reference": "2716db7eaadf6d9ba22c812aa2295647a09a05ce"
+                "reference": "d0e69b8bf36eabe8b1fe56a03a7c6240e9ad2d52"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/petervanderwal/adventofcode-cli/zipball/2716db7eaadf6d9ba22c812aa2295647a09a05ce",
-                "reference": "2716db7eaadf6d9ba22c812aa2295647a09a05ce",
+                "url": "https://api.github.com/repos/petervanderwal/adventofcode-cli/zipball/d0e69b8bf36eabe8b1fe56a03a7c6240e9ad2d52",
+                "reference": "d0e69b8bf36eabe8b1fe56a03a7c6240e9ad2d52",
                 "shasum": ""
             },
             "require": {
@@ -92,6 +92,9 @@
                 "symfony/http-kernel": "^6.4",
                 "symfony/yaml": "^6.4"
             },
+            "bin": [
+                "bin/puzzle-php-bridge"
+            ],
             "type": "symfony-bundle",
             "autoload": {
                 "psr-4": {
@@ -105,9 +108,9 @@
             "description": "A Symfony bundle that helps to create puzzle implementations for Advent of Code",
             "support": {
                 "issues": "https://github.com/petervanderwal/adventofcode-cli/issues",
-                "source": "https://github.com/petervanderwal/adventofcode-cli/tree/v1.0.1"
+                "source": "https://github.com/petervanderwal/adventofcode-cli/tree/v1.1.0"
             },
-            "time": "2024-11-28T20:52:45+00:00"
+            "time": "2024-12-02T20:40:14+00:00"
         },
         {
             "name": "psr/cache",

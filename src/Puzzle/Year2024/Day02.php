@@ -25,7 +25,7 @@ class Day02
     public function part1(PuzzleInput $input): int
     {
         $result = 0;
-        foreach ($input->trim()->split("\n") as $report) {
+        foreach ($input->split("\n") as $report) {
             $result += (int)$this->isSafe($report->split(' '));
         }
         return $result;
@@ -46,7 +46,7 @@ class Day02
     public function part2(PuzzleInput $input): int
     {
         $result = 0;
-        foreach ($input->trim()->split("\n") as $report) {
+        foreach ($input->split("\n") as $report) {
             $result += (int)$this->isSafe($report->split(' '), 1);
         }
         return $result;

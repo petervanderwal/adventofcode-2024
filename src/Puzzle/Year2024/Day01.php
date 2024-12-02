@@ -66,7 +66,7 @@ class Day01
     {
         $listA = [];
         $listB = [];
-        foreach ($input->trim()->split("\n") as $line) {
+        foreach ($input->split("\n") as $line) {
             [$a, $b] = preg_split('/\s+/', (string)$line);
             $listA[] = (int)$a;
             $listB[] = (int)$b;
