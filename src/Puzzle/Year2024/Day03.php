@@ -31,7 +31,7 @@ class Day03
         input: "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))",
         expectedAnswer: 48,
     )]
-    public function part2(PuzzleInput $input): int|string
+    public function part2(PuzzleInput $input): int
     {
         preg_match_all(
             '/do\(\)|don\'t\(\)|mul\(([0-9]{1,3}),([0-9]{1,3})\)/',
