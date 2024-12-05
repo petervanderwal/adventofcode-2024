@@ -5,7 +5,7 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.3",
-        "petervanderwal/adventofcode-cli": "^1.1",
+        "petervanderwal/adventofcode-cli": "^1.2",
         "symfony/console": "^6.4",
         "symfony/dotenv": "^6.4",
         "symfony/flex": "^2",
