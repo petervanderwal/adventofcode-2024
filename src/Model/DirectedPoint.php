@@ -10,7 +10,7 @@ class DirectedPoint extends Point
         public readonly Direction $direction,
         int $x = 0,
         int $y = 0,
-        ?int $z = 0,
+        ?int $z = null,
     ) {
         parent::__construct($x, $y, $z);
     }
@@ -43,5 +43,18 @@ class DirectedPoint extends Point
     public function toString(): string
     {
         return parent::toString() . ' facing ' . $this->direction->prettyName();
+    }
+
+    public function equalsCoordinates(?Point $other): bool
+    {
+        return parent::equals($other);
+    }
+
+    public function equals(?Point $other): bool
+    {
+        if (!$other instanceof DirectedPoint) {
+            return false;
+        }
+        return $this->equalsCoordinates($other) && $this->direction === $other->direction;
     }
 }

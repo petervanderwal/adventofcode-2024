@@ -210,8 +210,11 @@ class Point implements VertexInterface
         return $min + $normalized;
     }
 
-    public function equals(Point $other): bool
+    public function equals(?Point $other): bool
     {
+        if ($other === null) {
+            return false;
+        }
         return $this->x === $other->x && $this->y === $other->y && $this->z === $other->z;
     }
 }
