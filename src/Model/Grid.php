@@ -52,7 +52,7 @@ class Grid extends AbstractIterator
             $column = [];
             foreach (str_split(((string)$row)) as $character) {
                 if ($characterConverter !== null) {
-                    $character = $characterConverter($character, new Point(count($rows), count($column)));
+                    $character = $characterConverter($character, new Point(count($column), count($rows)));
                 }
                 $column[] = $character;
             }
