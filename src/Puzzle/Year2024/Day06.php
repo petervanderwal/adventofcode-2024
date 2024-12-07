@@ -14,7 +14,7 @@ use PeterVanDerWal\AdventOfCode\Cli\Model\PuzzleInput;
 
 class Day06
 {
-    const string DEMO_INPUT = <<<EOF
+    private const string DEMO_INPUT = <<<EOF
         ....#.....
         .........#
         ..........
