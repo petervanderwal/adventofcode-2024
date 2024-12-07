@@ -26,18 +26,30 @@ class Day07
     #[TestWithDemoInput(input: self::DEMO_INPUT, expectedAnswer: 3749)]
     public function part1(PuzzleInput $input): int
     {
+        return $this->solve($input, false);
+    }
+
+    #[Puzzle(2024, day: 7, part: 2)]
+    #[TestWithDemoInput(input: self::DEMO_INPUT, expectedAnswer: 11387)]
+    public function part2(PuzzleInput $input): int
+    {
+        return $this->solve($input, true);
+    }
+
+    private function solve(PuzzleInput $input, bool $allowConcatenate): int
+    {
         $result = 0;
         foreach ($input->split("\n") as $line) {
             [$answer, $numbers] = $line->split(': ');
             $answer = (int)(string)$answer;
-            if ($this->hasASolution($answer, ...$numbers->splitInt(' '))) {
+            if ($this->hasASolution($answer, $allowConcatenate, ...$numbers->splitInt(' '))) {
                 $result += $answer;
             }
         }
         return $result;
     }
 
-    private function hasASolution(int $answer, int ...$numbers): bool
+    private function hasASolution(int $answer, bool $allowConcatenate, int ...$numbers): bool
     {
         if (count($numbers) === 1) {
             return $answer === $numbers[0];
@@ -48,17 +60,42 @@ class Day07
 
         // Try (reverse of) + operation
         $remaining = $answer - $lastNumber;
-        if ($remaining > 0 && $this->hasASolution($remaining, ...$numbers)) {
+        if ($remaining > 0 && $this->hasASolution($remaining, $allowConcatenate, ...$numbers)) {
             return true;
         }
 
         // Try (reverse of) * operation
         $remaining = $answer / $lastNumber;
         // The is_int() check works in PHP? No rounding needed? -- Apparently it does
-        if (is_int($remaining) && $this->hasASolution($remaining, ...$numbers)) {
+        if (is_int($remaining) && $this->hasASolution($remaining, $allowConcatenate, ...$numbers)) {
             return true;
         }
 
+        if ($allowConcatenate) {
+            $remaining = $this->reverseConcatenate($answer, $lastNumber);
+            if ($remaining !== null && $this->hasASolution($remaining, true, ...$numbers)) {
+                return true;
+            }
+        }
+
         return false;
+    }
+
+    /**
+     * @param int $answer
+     * @param int $rightHand
+     * @return int|null $leftHand
+     */
+    private function reverseConcatenate(int $answer, int $rightHand): ?int
+    {
+        // Add a + 1: if $rightHand === 10, then we want a power of 2, not a power of 1
+        $power = (int)ceil(log10($rightHand + 1));
+        $divisor = pow(10, $power);
+
+        if ($answer % $divisor !== $rightHand) {
+            // The left most digits doesn't match the rightHand number
+            return null;
+        }
+        return (int)($answer / $divisor);
     }
 }
