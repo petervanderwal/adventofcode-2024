@@ -66,21 +66,9 @@ class Day08
      */
     private function getInterferenceLocations(Point $firstLocation, Point $otherLocation): array
     {
-        // Note: due to the way we walk through the map, $otherLocation->y will allways be >= $firstLocation->y
-
-        $dx = abs($otherLocation->x - $firstLocation->x);
-        $dy = abs($otherLocation->y - $firstLocation->y);
-
-        if ($otherLocation->x >= $firstLocation->x) {
-            return [
-                new Point(x: $firstLocation->x - $dx, y: $firstLocation->y - $dy),
-                new Point(x: $otherLocation->x + $dx, y: $otherLocation->y + $dy),
-            ];
-        }
-
         return [
-            new Point(x: $firstLocation->x + $dx, y: $firstLocation->y - $dy),
-            new Point(x: $otherLocation->x - $dx, y: $otherLocation->y + $dy),
+            $firstLocation->mirror($otherLocation),
+            $otherLocation->mirror($firstLocation),
         ];
     }
 }

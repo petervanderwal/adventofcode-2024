@@ -217,4 +217,13 @@ class Point implements VertexInterface
         }
         return $this->x === $other->x && $this->y === $other->y && $this->z === $other->z;
     }
+
+    public function mirror(Point $mirrorLocation): Point
+    {
+        return $mirrorLocation->moveXYZ(
+            xSteps: $mirrorLocation->x - $this->x,
+            ySteps: $mirrorLocation->y - $this->y,
+            zSteps: $this->z === null ? null : $mirrorLocation->z - $this->z,
+        );
+    }
 }
