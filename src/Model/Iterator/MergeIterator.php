@@ -9,13 +9,13 @@ use Traversable;
 /**
  * @template TKey
  * @template TValue
- * @extends AbstractWrappedIterator<TKey, TValue>
+ * @extends WrappedIterator<TKey, TValue>
  */
-class MergeIterator extends AbstractWrappedIterator
+class MergeIterator extends WrappedIterator
 {
     public function getIterator(): Traversable
     {
-        foreach ($this->internalIterator as $iterator) {
+        foreach (parent::getIterator() as $iterator) {
             yield from $iterator;
         }
     }

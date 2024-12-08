@@ -13,8 +13,9 @@ abstract class AbstractGridRowColumn extends AbstractGridIterator
         Grid $grid,
         protected int $index,
         bool $reverse = false,
+        ?int $startingFrom = null,
     ) {
-        parent::__construct($grid, $reverse);
+        parent::__construct($grid, $reverse, $startingFrom);
     }
 
     public function reverse(): static
@@ -34,13 +35,17 @@ abstract class AbstractGridRowColumn extends AbstractGridIterator
         return $this->grid->get($this->getCoordinate($index));
     }
 
+    /**
+     * @param null|callable(mixed $char, Point $point): string $characterPlotter
+     * @return string
+     */
     public function toString(?callable $characterPlotter = null): string
     {
         $characterPlotter ??= fn (mixed $char) => $char instanceof \BackedEnum ? (string)$char->value : (string)$char;
 
         $result = '';
-        foreach ($this as $character) {
-            $result .= $characterPlotter($character);
+        foreach ($this as $point => $character) {
+            $result .= $characterPlotter($character, $point);
         }
         return $result;
     }

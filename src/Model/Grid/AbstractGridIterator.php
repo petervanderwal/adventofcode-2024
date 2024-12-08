@@ -14,6 +14,7 @@ abstract class AbstractGridIterator extends AbstractIterator
     public function __construct(
         protected Grid $grid,
         protected bool $reverse = false,
+        protected ?int $startingFrom = null,
     ) {}
 
     public function reverse(): static
@@ -41,7 +42,7 @@ abstract class AbstractGridIterator extends AbstractIterator
     protected function getForwardIterator(): Traversable
     {
         $count = count($this);
-        for ($index = 0; $index < $count; $index++) {
+        for ($index = $this->startingFrom ?? 0; $index < $count; $index++) {
             yield $this->getIndex($index) => $this->getItem($index);
         }
     }
@@ -49,7 +50,7 @@ abstract class AbstractGridIterator extends AbstractIterator
     protected function getReverseIterator(): Traversable
     {
         $count = count($this);
-        for ($index = $count - 1; $index >= 0; $index--) {
+        for ($index = $this->startingFrom ?? $count - 1; $index >= 0; $index--) {
             yield $this->getIndex($index) => $this->getItem($index);
         }
     }

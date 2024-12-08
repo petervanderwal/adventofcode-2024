@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Model\Iterator\AbstractIterator;
+use App\Model\Iterator\ArrayIterator;
 use App\Model\Iterator\GeneratedIterator;
 use App\Model\Grid\Area;
 use App\Model\Grid\BorderEntrance;
@@ -14,6 +15,7 @@ use App\Model\Grid\MatchIterator;
 use App\Model\Grid\Row;
 use App\Model\Grid\RowIterator;
 use App\Model\Iterator\IteratorInterface;
+use App\Model\Iterator\WrappedIterator;
 use App\Utility\IterableUtility;
 use BadMethodCallException;
 use Generator;
@@ -320,11 +322,44 @@ class Grid extends AbstractIterator
         }
     }
 
+    public function startingFrom(Point $point, bool $excluding = false): IteratorInterface
+    {
+        $startRow = $point->getRow();
+        $startColumn = $point->getColumn();
+
+        if (!$this->hasCoordinate($startRow, $startColumn)) {
+            throw new OutOfRangeException(sprintf('No such row, column: %d, %d', $startRow, $startColumn));
+        }
+
+        if ($excluding) {
+            $startColumn++;
+            if ($startColumn === $this->getNumberOfColumns()) {
+                $startRow++;
+                $startColumn = 0;
+
+                if ($startRow === $this->getNumberOfRows()) {
+                    return new ArrayIterator([]);
+                }
+            }
+        }
+
+        return new WrappedIterator(function () use ($startRow, $startColumn): iterable {
+            for ($rowNumber = $startRow; $rowNumber < count($this->rows); $rowNumber++) {
+                yield from new Row($this, $rowNumber, startingFrom: $startColumn);
+                $startColumn = 0; // Reset to zero for the next row
+            }
+        });
+    }
+
     public function matches(string $pattern): MatchIterator
     {
         return new MatchIterator($this, $pattern);
     }
 
+    /**
+     * @param null|callable(mixed $char, Point $point): string $characterPlotter
+     * @return string
+     */
     public function plot(?callable $characterPlotter = null): string
     {
         $lines = [];

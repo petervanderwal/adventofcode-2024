@@ -6,10 +6,10 @@ namespace App\Model\Iterator;
 
 use Traversable;
 
-class RepeatedIterator extends AbstractWrappedIterator
+class RepeatedIterator extends WrappedIterator
 {
     public function __construct(
-        IteratorInterface $internalIterator,
+        iterable $internalIterator,
         public ?int $amountOfRepeats = null,
     ) {
         parent::__construct($internalIterator);
@@ -18,7 +18,7 @@ class RepeatedIterator extends AbstractWrappedIterator
     public function getIterator(): Traversable
     {
         for ($i = 0; $this->amountOfRepeats === null || $i < $this->amountOfRepeats; $i++) {
-            yield from $this->internalIterator;
+            yield from parent::getIterator();
         }
     }
 }
