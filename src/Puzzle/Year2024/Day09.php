@@ -80,4 +80,79 @@ class Day09
         }
         return $result;
     }
+
+    #[Puzzle(2024, day: 9, part: 2)]
+    #[TestWithDemoInput(self::DEMO_INPUT, expectedAnswer: 2858)]
+    public function part2(PuzzleInput $input): int
+    {
+        $stringRepresentation = $input->isDemoInput();
+        $input = (string)$input;
+
+        $files = [];
+        $freeBlocks = [];
+
+        $isFile = true;
+        $cursor = 0;
+        for ($i = 0; $i < strlen($input); $i++) {
+            $size = (int)$input[$i];
+            if ($isFile) {
+                $files[] = ['start' => $cursor, 'size' => $size];
+            } else {
+                $freeBlocks[] = ['start' => $cursor, 'size' => $size];
+            }
+
+            $cursor += $size;
+            $isFile = !$isFile;
+        }
+
+        if ($stringRepresentation) {
+            $diskDebugMap = str_repeat('.', $cursor);
+        }
+
+        $result = 0;
+        for ($fileId = count($files) - 1; $fileId >= 0; $fileId--) {
+            $file = &$files[$fileId];
+
+            // By default, 'insert' the file on its original location (unless we find a better location below)
+            $insertFileAt = $file['start'];
+
+            // Try to move to first free block
+            foreach ($freeBlocks as $index => &$freeBlock) {
+                if ($freeBlock['start'] > $file['start']) {
+                    // We reached the free blocks AFTER the file, stop iterating $freeBlocks
+                    break;
+                }
+
+                if ($freeBlock['size'] >= $file['size']) {
+                    // Insert file on free block location
+                    $insertFileAt = $freeBlock['start'];
+
+                    if ($freeBlock['size'] === $file['size']) {
+                        // Remove free block
+                        unset($freeBlocks[$index]);
+                    } else {
+                        // Update free block
+                        $freeBlock['start'] += $file['size'];
+                        $freeBlock['size'] -= $file['size'];
+                    }
+
+                    break;
+                }
+            }
+
+            // Actually insert the file (as in: calculate the result)
+            for ($i = 0; $i < $file['size']; $i++) {
+                $result += $fileId * ($insertFileAt + $i);
+
+                if ($stringRepresentation) {
+                    $diskDebugMap[$insertFileAt + $i] = $fileId;
+                }
+            }
+        }
+
+        if ($stringRepresentation) {
+            dump($diskDebugMap);
+        }
+        return $result;
+    }
 }
