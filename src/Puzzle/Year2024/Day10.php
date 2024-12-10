@@ -88,4 +88,67 @@ class Day10
         }
         return $pointReachable;
     }
+
+    #[Puzzle(2024, day: 10, part: 2)]
+    #[TestWithDemoInput(self::DEMO_INPUT, expectedAnswer: 81)]
+    public function part2(PuzzleInput $input): int
+    {
+        $debug = $input->isDemoInput();
+
+        $map = Grid::read($input, fn (string $char) => [
+            'height' => (int)$char,
+            'score' => $char === '9' ? 1 : null,
+        ]);
+
+        for ($height = 8; $height > 0; $height--) {
+            foreach ($map->where(fn ($info) => $info['height'] === $height)->keys() as $point) {
+                $map->set($point, [
+                    'height' => $height,
+                    'score' => $this->getPointScore($map, $point, $height),
+                ]);
+            }
+        }
+
+        $result = 0;
+        foreach ($map->where(fn ($info) => $info['height'] === 0)->keys() as $point) {
+            $pointScore = $this->getPointScore($map, $point, 0);
+            $result += $pointScore;
+
+            if ($debug) {
+                $map->set($point, [
+                    'height' => 0,
+                    'score' => $pointScore,
+                ]);
+            }
+        }
+
+        if ($debug) {
+            $green = new Color('green', options: ['bold']);
+            $blue = new Color('blue', options: ['bold']);
+            echo $map->plot(fn (array $data) => sprintf(
+                    '%s %-19s ',
+                    $green->apply((string)$data['height']),
+                    '(' . $blue->apply((string)$data['score']) . ')',
+                )) . "\n\n";
+        }
+
+        return $result;
+    }
+
+    private function getPointScore(Grid $map, Point $point, int $pointHeight): int
+    {
+        $pointScore = 0;
+        foreach (Direction::straightCases() as $direction) {
+            $uphill = $point->moveDirection($direction);
+            if (!$map->hasPoint($uphill)) {
+                continue;
+            }
+
+            $uphillData = $map->get($uphill);
+            if ($uphillData['height'] === $pointHeight + 1) {
+                $pointScore += $uphillData['score'];
+            }
+        }
+        return $pointScore;
+    }
 }
