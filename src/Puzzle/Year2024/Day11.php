@@ -14,28 +14,41 @@ class Day11
     #[TestWithDemoInput('125 17', expectedAnswer: 55312)]
     public function part1(PuzzleInput $input): int
     {
-        $lineOfNumbers = $input->splitInt(' ');
-        for ($i = 0; $i < 25; $i++) {
+        return $this->solve($input, 25);
+    }
+
+    #[Puzzle(2024, day: 11, part: 2)]
+    public function part2(PuzzleInput $input): int
+    {
+        return $this->solve($input, 75);
+    }
+
+    private function solve(PuzzleInput $input, int $amountOfIterations): int
+    {
+        $numberAmount = [];
+        foreach ($input->splitInt(' ') as $number) {
+            $numberAmount[$number] = ($numberAmount[$number] ?? 0) + 1;
+        }
+
+        for ($i = 0; $i < $amountOfIterations; $i++) {
             $nextIteration = [];
-            foreach ($lineOfNumbers as $number) {
+            foreach ($numberAmount as $number => $amount) {
                 if ($number === 0) {
-                    $nextIteration[] = 1;
+                    $nextIteration[1] = ($nextIteration[1] ?? 0) + $amount;
                 } elseif (strlen((string)$number) % 2 === 0) {
                     $numbers = str_split((string)$number, strlen((string)$number) / 2);
-                    $nextIteration[] = (int)$numbers[0];
-                    $nextIteration[] = (int)$numbers[1];
+                    $nextIteration[(int)$numbers[0]] = ($nextIteration[(int)$numbers[0]] ?? 0) + $amount;
+                    $nextIteration[(int)$numbers[1]] = ($nextIteration[(int)$numbers[1]] ?? 0) + $amount;
                 } else {
-                    $nextIteration[] = $number * 2024;
+                    $nextIteration[$number * 2024] = ($nextIteration[$number * 2024] ?? 0) + $amount;
                 }
             }
 
-            $lineOfNumbers = $nextIteration;
-            if ($i === 5 && $input->isDemoInput()) {
-                echo "After 6 blinks: \n" . implode(' ', $lineOfNumbers) . "\n\n";
-            } elseif ($i % 5 === 0 && !$input->isDemoInput()) {
+            $numberAmount = $nextIteration;
+            if ($i % 5 === 0 && !$input->isDemoInput()) {
                 echo '[' . date('H:i:s') . "] Done first $i iterations...\n";
             }
         }
-        return count($lineOfNumbers);
+        return array_sum($numberAmount);
     }
 }
