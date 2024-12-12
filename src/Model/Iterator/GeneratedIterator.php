@@ -6,6 +6,11 @@ namespace App\Model\Iterator;
 
 use Traversable;
 
+/**
+ * @template TKey
+ * @template TValue
+ * @extends IteratorInterface<TKey, TValue>
+ */
 class GeneratedIterator extends AbstractIterator
 {
     /**
