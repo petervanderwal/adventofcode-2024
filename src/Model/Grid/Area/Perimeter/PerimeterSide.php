@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Model\Grid\Area;
+namespace App\Model\Grid\Area\Perimeter;
 
 use App\Model\DirectedPoint;
 use App\Model\Iterator\AbstractArrayIterator;

@@ -57,4 +57,9 @@ class DirectedPoint extends Point
         }
         return $this->equalsCoordinates($other) && $this->direction === $other->direction;
     }
+
+    public function removeDirection(): Point
+    {
+        return new Point($this->x, $this->y, $this->z);
+    }
 }

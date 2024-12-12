@@ -54,6 +54,11 @@ enum Direction
         ];
     }
 
+    public function isStraightCase(): bool
+    {
+        return in_array($this, self::straightCases(), true);
+    }
+
     public static function fromCharacter(string $character): Direction
     {
         static $characters = [];
@@ -153,5 +158,23 @@ enum Direction
     public function prettyName(): string
     {
         return strtolower(str_replace('_', '-', $this->name));
+    }
+
+    public function combine(Direction $other): Direction
+    {
+        return match (true) {
+            $this === self::NORTH && $other === self::WEST,
+            $this === self::WEST && $other === self::NORTH => self::NORTH_WEST,
+            $this === self::NORTH && $other === self::EAST,
+            $this === self::EAST && $other === self::NORTH => self::NORTH_EAST,
+            $this === self::SOUTH && $other === self::EAST,
+            $this === self::EAST && $other === self::SOUTH => self::SOUTH_EAST,
+            $this === self::SOUTH && $other === self::WEST,
+            $this === self::WEST && $other === self::SOUTH => self::SOUTH_WEST,
+            default => throw new \InvalidArgumentException(
+                'No such combination: ' . $this->name . ' and ' . $other->name,
+                241212174118
+            ),
+        };
     }
 }

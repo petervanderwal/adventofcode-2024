@@ -226,4 +226,9 @@ class Point implements VertexInterface
             zSteps: $this->z === null ? null : $mirrorLocation->z - $this->z,
         );
     }
+
+    public function addDirection(Direction $direction): DirectedPoint
+    {
+        return new DirectedPoint($direction, $this->x, $this->y, $this->z);
+    }
 }

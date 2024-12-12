@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Model\Grid\Area;
 
 use App\Model\DirectedPoint;
+use App\Model\Grid\Area\Perimeter\PerimeterSide;
 use App\Model\Iterator\AbstractArrayIterator;
 use App\Model\Iterator\IteratorInterface;
 
