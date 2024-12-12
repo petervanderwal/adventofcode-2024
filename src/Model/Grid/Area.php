@@ -6,24 +6,28 @@ namespace App\Model\Grid;
 
 use App\Model\DirectedPoint;
 use App\Model\Direction;
-use App\Model\Iterator\AbstractArrayIterator;
 use App\Model\Grid;
+use App\Model\Grid\Area\Perimeter;
+use App\Model\Iterator\AbstractArrayIterator;
 use App\Model\Point;
 
 class Area extends AbstractArrayIterator
 {
     /** @var Point[] */
     private array $points;
+    private Perimeter $perimeter;
 
     public function __construct(
         public readonly Grid $grid,
         Point ...$points
     ) {
-        $this->points = $points;
+        foreach ($points as $point) {
+            $this->addPoint($point);
+        }
     }
 
     /**
-     * @return Point[]
+     * @return array<string, Point>
      */
     public function getPoints(): array
     {
@@ -32,7 +36,7 @@ class Area extends AbstractArrayIterator
 
     public function getFirstPoint(): Point
     {
-        return $this->points[0];
+        return reset($this->points);
     }
 
     public function getFirstValue(): mixed
@@ -47,7 +51,8 @@ class Area extends AbstractArrayIterator
 
     public function addPoint(Point $point): static
     {
-        $this->points[] = $point;
+        $this->points[(string)$point] = $point;
+        unset($this->perimeter);
         return $this;
     }
 
@@ -61,31 +66,27 @@ class Area extends AbstractArrayIterator
         return count($this);
     }
 
-    /**
-     * @return DirectedPoint[]
-     */
-    public function getOuterBorder(): array
+    public function getPerimeter(): Perimeter
     {
-        $thisPoints = [];
-        foreach ($this->points as $point) {
-            $thisPoints[(string)$point] = $point;
+        if (isset($this->perimeter)) {
+            return $this->perimeter;
         }
 
-        $outerBorder = [];
-        foreach ($thisPoints as $point) {
+        $perimeter = [];
+        foreach ($this->points as $point) {
             foreach (Direction::straightCases() as $direction) {
                 $neighbour = $point->moveDirection($direction);
-                if (isset($thisPoints[(string)$neighbour])) {
+                if (isset($this->points[(string)$neighbour])) {
                     continue;
                 }
 
                 $border = new DirectedPoint($direction, $point->x, $point->y, $point->z);
                 $borderKey = (string)$border;
-                if (!isset($outerBorder[$borderKey])) {
-                    $outerBorder[$borderKey] = $border;
+                if (!isset($perimeter[$borderKey])) {
+                    $perimeter[$borderKey] = $border;
                 }
             }
         }
-        return array_values($outerBorder);
+        return $this->perimeter = new Perimeter(...$perimeter);
     }
 }

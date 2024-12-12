@@ -45,7 +45,7 @@ class Day12
             ) as $area
         ) {
             $size = $area->getSize();
-            $perimeter = count($area->getOuterBorder());
+            $perimeter = count($area->getPerimeter());
 
             if ($input->isDemoInput()) {
                 echo sprintf(
@@ -73,7 +73,7 @@ class Day12
             ) as $area
         ) {
             $size = $area->getSize();
-            $sides = $this->countSides(...$area->getOuterBorder());
+            $sides = count($area->getPerimeter()->getSides());
 
             if ($input->isDemoInput()) {
                 echo sprintf(
@@ -87,40 +87,5 @@ class Day12
             $result += $size * $sides;
         }
         return $result;
-    }
-
-    private function countSides(DirectedPoint ...$border): int
-    {
-        $borderIndexed = [];
-        foreach ($border as $borderPoint) {
-            $borderIndexed[(string)$borderPoint] = $borderPoint;
-        }
-
-        $seen = [];
-        $sides = 0;
-        foreach ($borderIndexed as $key => $borderPoint) {
-            if (in_array($key, $seen)) {
-                continue;
-            }
-
-            $seen[] = (string)$borderPoint;
-            $sides++;
-
-            $moveDirection = $borderPoint->direction->turnRight();
-            $movedBorder = $borderPoint->moveDirection($moveDirection);
-            while (isset($borderIndexed[(string)$movedBorder])) {
-                $seen[] = (string)$movedBorder;
-                $movedBorder = $movedBorder->moveDirection($moveDirection);
-            }
-
-            $moveDirection = $borderPoint->direction->turnLeft();
-            $movedBorder = $borderPoint->moveDirection($moveDirection);
-            while (isset($borderIndexed[(string)$movedBorder])) {
-                $seen[] = (string)$movedBorder;
-                $movedBorder = $movedBorder->moveDirection($moveDirection);
-            }
-        }
-
-        return $sides;
     }
 }
