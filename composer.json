@@ -7,6 +7,7 @@
         "php": ">=8.3",
         "ext-gd": "*",
         "petervanderwal/adventofcode-cli": "^1.2",
+        "spatie/async": "^1.6",
         "symfony/console": "^6.4",
         "symfony/dotenv": "^6.4",
         "symfony/flex": "^2",
