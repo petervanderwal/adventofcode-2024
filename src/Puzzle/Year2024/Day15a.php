@@ -27,7 +27,7 @@ class Day15a
         <^^>>>vv<v>>v<<
         EOF;
 
-    private const string LARGE_DEMO = <<<EOF
+    public const string LARGE_DEMO = <<<EOF
         ##########
         #..O..O.O#
         #......O.#
