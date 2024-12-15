@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Utility;
 
 use App\Model\Point;
+use UnexpectedValueException;
 
 class MathUtility
 {
@@ -58,5 +59,31 @@ class MathUtility
             $sum += $leftPoint->x * $rightPoint->y - $leftPoint->y * $rightPoint->x;
         }
         return abs($sum) / 2;
+    }
+
+    /**
+     * For a formula
+     *     x * $factor % $modulo = $remainder
+     * solve x in the form x = first + repeat * i    (where i is integer)
+     *
+     * @return null|array{first: int, repeat: int}
+     */
+    public static function reverseModule(int $factor, int $modulo, int $remainder): ?array
+    {
+        $gcd = MathUtility::greatestCommonDivisor($factor, $modulo);
+        if ($remainder % $gcd !== 0) {
+            return null;
+        }
+
+        $factor /= $gcd;
+        $modulo /= $gcd;
+        $remainder /= $gcd;
+
+        for ($first = 0; $first < $modulo; $first++) {
+            if (($first * $factor) % $modulo === $remainder) {
+                return ['first' => $first, 'repeat' => $modulo];
+            }
+        }
+        throw new UnexpectedValueException('Failed to reverse module, although gcd indicates it should succeed', 241215193745);
     }
 }
