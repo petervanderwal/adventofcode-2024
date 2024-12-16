@@ -70,6 +70,15 @@ class Graph implements GraphInterface
         return $this;
     }
 
+    public function getOrAddVertex(VertexInterface $vertex): VertexInterface
+    {
+        $identifier = $vertex->getVertexIdentifier();
+        if (isset($this->vertices[$identifier])) {
+            return $this->vertices[$identifier];
+        }
+        return $this->vertices[$identifier] = $vertex;
+    }
+
     /**
      * @return EdgeInterface[]
      */
