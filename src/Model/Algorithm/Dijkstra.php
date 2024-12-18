@@ -17,7 +17,7 @@ class Dijkstra
     private array $distances;
 
     /**
-     * @var VertexInterface[]
+     * @var array<string, VertexInterface>
      */
     private array $previous;
 
@@ -25,6 +25,11 @@ class Dijkstra
     private array $sources;
 
     private WeightedQueue $queue;
+
+    /**
+     * @var array<string, VertexInterface[]>
+     */
+    private array $alternatives = [];
 
     private function __construct(
         private readonly GraphInterface $graph,
@@ -65,9 +70,12 @@ class Dijkstra
         return $this->distances[$to];
     }
 
-    public function getAllPrevious(): array
+    public function getAllPrevious(string|VertexInterface $to): array
     {
-        return $this->previous;
+        if ($to instanceof VertexInterface) {
+            $to = $to->getVertexIdentifier();
+        }
+        return [$this->previous[$to], ...($this->alternatives[$to] ?? [])];
     }
 
     public function getPrevious(string|VertexInterface $to): VertexInterface
@@ -89,6 +97,34 @@ class Dijkstra
             $result[] = $to = $this->getPrevious($to);
         }
         return array_reverse($result);
+    }
+
+    /**
+     * @param VertexInterface $to
+     * @return array<int, VertexInterface[]>
+     */
+    public function getAllPaths(VertexInterface $to): array
+    {
+        $result = [];
+        foreach ($this->_getAllPaths($to) as $path) {
+            $result[] = [...$path, $to];
+        }
+        return $result;
+    }
+
+    private function _getAllPaths(VertexInterface $to): array
+    {
+        if (in_array($to->getVertexIdentifier(), $this->sources, true)) {
+            return [[$to]];
+        }
+
+        $paths = [];
+        foreach ($this->getAllPrevious($to) as $previous) {
+            foreach ($this->_getAllPaths($previous) as $path) {
+                $paths[] = [...$path, $previous];
+            }
+        }
+        return $paths;
     }
 
     private function initiate(): static
@@ -131,6 +167,8 @@ class Dijkstra
                     $this->distances[$to->getVertexIdentifier()] = $pathCost;
                     $this->previous[$to->getVertexIdentifier()] = $from;
                     $this->queue->addWithPriority($to, $pathCost);
+                } elseif ($pathCost === $this->distances[$to->getVertexIdentifier()]) {
+                    $this->alternatives[$to->getVertexIdentifier()][] = $from;
                 }
             }
         }

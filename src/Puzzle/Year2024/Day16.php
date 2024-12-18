@@ -61,6 +61,35 @@ class Day16
     #[TestWithDemoInput(self::SECOND_DEMO_INPUT, expectedAnswer: 11048, name: 'second demo')]
     public function part1(PuzzleInput $input): int
     {
+        [$shortestPathAlgorithm, $end] = $this->solve($input);
+        return $shortestPathAlgorithm->getDistance($end);
+    }
+
+    #[Puzzle(2024, day: 16, part: 2)]
+    #[TestWithDemoInput(self::FIRST_DEMO_INPUT, expectedAnswer: 45, name: 'first demo')]
+    #[TestWithDemoInput(self::SECOND_DEMO_INPUT, expectedAnswer: 64, name: 'second demo')]
+    public function part2(PuzzleInput $input): int
+    {
+        [$shortestPathAlgorithm, $end] = $this->solve($input);
+
+        $visitedPoints = [];
+        $allPaths = $shortestPathAlgorithm->getAllPaths($end);
+        foreach ($allPaths as $path) {
+            foreach ($path as $point) {
+                if ($point instanceof DirectedPoint) {
+                    $point = $point->removeDirection();
+                }
+                $visitedPoints[(string)$point] = true;
+            }
+        }
+        return count($visitedPoints);
+    }
+
+    /**
+     * @return array{0: Dijkstra, 1: Point}
+     */
+    private function solve(PuzzleInput $input): array
+    {
         // In the end this is a shortest-path problem which we can solve with a shortest-path algorithm. So let's model
         // it as that.
         // Let's note all our vertices (single point) within our problem, where each vertex is not just a position but a
@@ -150,7 +179,6 @@ class Day16
         }
 
         // Finally, now we've modeled our graph, lets the shortest path algorithm do its work
-        $shortestPathAlgorithm = Dijkstra::calculate($graph, $start);
-        return $shortestPathAlgorithm->getDistance($end);
+        return [Dijkstra::calculate($graph, $start), $end];
     }
 }
