@@ -10,6 +10,7 @@ use App\Model\Point;
 use PeterVanDerWal\AdventOfCode\Cli\Attribute\Puzzle;
 use PeterVanDerWal\AdventOfCode\Cli\Attribute\TestWithDemoInput;
 use PeterVanDerWal\AdventOfCode\Cli\Model\PuzzleInput;
+use Spatie\Async\Pool;
 
 class Day20
 {
@@ -55,9 +56,15 @@ class Day20
         $this->init($input);
 
         $cheats = 0;
+        $pool = Pool::create();
         for ($cheatLength = 2; $cheatLength <= 20; $cheatLength++) {
-            $cheats += $this->getCheats($minimumCheatScore, $cheatLength);
+            $pool->add(function () use ($minimumCheatScore, $cheatLength) {
+                return $this->getCheats($minimumCheatScore, $cheatLength);
+            })->then(function (int $answer) use (&$cheats) {
+                $cheats += $answer;
+            });
         }
+        $pool->wait();
         return $cheats;
     }
 
