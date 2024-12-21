@@ -47,12 +47,12 @@ class Grid extends AbstractIterator
      * @param callable(string, Point): TCallableCellType|null $characterConverter
      * @return Grid<TCallableCellType>
      */
-    public static function read(UnicodeString $string, ?callable $characterConverter = null): static
+    public static function read(UnicodeString|string $string, ?callable $characterConverter = null): static
     {
         $rows = [];
-        foreach ($string->split("\n") as $row) {
+        foreach (explode("\n", (string)$string) as $row) {
             $column = [];
-            foreach (str_split(((string)$row)) as $character) {
+            foreach (str_split($row) as $character) {
                 if ($characterConverter !== null) {
                     $character = $characterConverter($character, new Point(count($column), count($rows)));
                 }
