@@ -7,6 +7,8 @@ namespace App\Puzzle\Year2024;
 use PeterVanDerWal\AdventOfCode\Cli\Attribute\Puzzle;
 use PeterVanDerWal\AdventOfCode\Cli\Attribute\TestWithDemoInput;
 use PeterVanDerWal\AdventOfCode\Cli\Model\PuzzleInput;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class Day21
 {
@@ -36,23 +38,7 @@ class Day21
             default => 3,
         };
 
-        $numericKeypad = new Day21\Keypad(<<<EOF
-            789
-            456
-            123
-             0A
-            EOF);
-        $directionalKeypad = new Day21\Keypad(<<<EOF
-             ^A
-            <v>
-            EOF);
-
-        $previousButtonPresser = new Day21\Human();
-        for ($i = 0; $i < $amountOfRobots - 1; $i++) {
-            $previousButtonPresser = new Day21\Robot($directionalKeypad, $previousButtonPresser);
-        }
-        $robot = new Day21\Robot($numericKeypad, $previousButtonPresser);
-
+        $robot = $this->getRobot($amountOfRobots);
         $result = 0;
         foreach ($input->splitLines() as $line) {
             $robot->resetCursor();
@@ -70,5 +56,44 @@ class Day21
             $result += ((int)$line) * $pressesLength;
         }
         return $result;
+    }
+
+    #[Puzzle(2024, day: 21, part: 2)]
+    public function part2(PuzzleInput $input): int
+    {
+        $robot = $this->getRobot(26);
+
+        $result = 0;
+        foreach ($input->splitLines() as $line) {
+            $robot->resetCursor();
+            $presses = 0;
+
+            foreach (str_split($line) as $button) {
+                $presses += $robot->getCostToPress($button);
+            }
+            $result += ((int)$line) * $presses;
+        }
+
+        return $result;
+    }
+
+    private function getRobot(int $amountOfRobots): Day21\Robot
+    {
+        $numericKeypad = new Day21\Keypad(<<<EOF
+            789
+            456
+            123
+             0A
+            EOF);
+        $directionalKeypad = new Day21\Keypad(<<<EOF
+             ^A
+            <v>
+            EOF);
+
+        $previousButtonPresser = new Day21\Human();
+        for ($i = 0; $i < $amountOfRobots - 1; $i++) {
+            $previousButtonPresser = new Day21\Robot($directionalKeypad, $previousButtonPresser);
+        }
+        return new Day21\Robot($numericKeypad, $previousButtonPresser);
     }
 }
