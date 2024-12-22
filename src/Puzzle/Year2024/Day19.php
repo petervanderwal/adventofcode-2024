@@ -29,9 +29,9 @@ class Day19
     private array $availableTowels = [];
 
     /**
-     * @var array<string, array<string, int>>
+     * @var array<string, array<string, int>|int>
      */
-    private array $optionsStartingWithCache = [];
+    private array $cache = [];
 
     #[Puzzle(2024, day: 19, part: 1)]
     #[TestWithDemoInput(self::DEMO_INPUT, expectedAnswer: 6)]
@@ -56,7 +56,8 @@ class Day19
 
         $result = 0;
         foreach ($desiredPatterns as $pattern) {
-            $result += $this->getAllOptionsStartingWith($pattern)[''] ?? 0;
+            //$result += $this->getAllOptionsStartingWith__old_solution($pattern)[''] ?? 0;
+            $result += $this->getAmountOfPossibilities($pattern);
         }
         return $result;
     }
@@ -73,7 +74,7 @@ class Day19
             $this->availableTowels[$towel[0]][] = $towel;
         }
 
-        $this->optionsStartingWithCache = [];
+        $this->cache = [];
 
         return $desiredPatterns->splitLines();
     }
@@ -106,14 +107,14 @@ class Day19
      *          "wu" => 2, // Indicating two options reaching "gbbwu" ("gb"."bwu" and "g."b"."bwu")
      *      ]
      */
-    private function getAllOptionsStartingWith(string $startingWith): array
+    private function getAllOptionsStartingWith__old_solution(string $startingWith): array
     {
-        if (isset($this->optionsStartingWithCache[$startingWith])) {
-            return $this->optionsStartingWithCache[$startingWith];
+        if (isset($this->cache[$startingWith])) {
+            return $this->cache[$startingWith];
         }
 
         if (strlen($startingWith) === 1) {
-            return $this->optionsStartingWithCache[$startingWith] = array_fill_keys(
+            return $this->cache[$startingWith] = array_fill_keys(
                 keys: array_map(
                     callback: fn(string $towel) => substr($towel, 1),
                     array: $this->availableTowels[$startingWith],
@@ -122,7 +123,7 @@ class Day19
             );
         }
 
-        $previousOptions = $this->getAllOptionsStartingWith(substr($startingWith, 0, -1));
+        $previousOptions = $this->getAllOptionsStartingWith__old_solution(substr($startingWith, 0, -1));
         $lastCharacter = substr($startingWith, -1);
 
         $options = [];
@@ -141,6 +142,23 @@ class Day19
                 $options[$overflow] = ($options[$overflow] ?? 0) + $possibilities;
             }
         }
-        return $this->optionsStartingWithCache[$startingWith] = $options;
+        return $this->cache[$startingWith] = $options;
+    }
+
+    public function getAmountOfPossibilities(string $pattern): int
+    {
+        if (isset($this->cache[$pattern])) {
+            return $this->cache[$pattern];
+        }
+
+        $result = 0;
+        foreach ($this->availableTowels[$pattern[0]] as $towel) {
+            if ($towel === $pattern) {
+                $result++;
+            } elseif (str_starts_with($pattern, $towel)) {
+                $result += $this->getAmountOfPossibilities(substr($pattern, strlen($towel)));
+            }
+        }
+        return $this->cache[$pattern] = $result;
     }
 }
