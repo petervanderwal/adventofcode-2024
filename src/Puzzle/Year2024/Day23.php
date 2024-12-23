@@ -56,18 +56,67 @@ class Day23
     {
         $this->init($input);
 
-        $result = [];
+        $result = 0;
         foreach ($this->tuples as $index => $tuple) {
             [$a, $b] = $tuple;
-            foreach ($this->getComputersConnectedWithBoth($a, $b, $index + 1) as $c) {
+            foreach ($this->getComputersConnectedWithAll($index + 1, $a, $b) as $c => $ignore) {
                 if (str_starts_with($a, 't') || str_starts_with($b, 't') || str_starts_with($c, 't')) {
-                    $key = [$a, $b, $c];
-                    sort($key);
-                    $result[implode('-', $key)] = true;
+                    $result++;
                 }
             }
         }
-        return count($result);
+        return $result;
+    }
+
+    #[Puzzle(2024, day: 23, part: 2)]
+    #[TestWithDemoInput(self::DEMO_INPUT, expectedAnswer: 'co,de,ka,ta')]
+    public function part2(PuzzleInput $input): string
+    {
+        $this->init($input);
+
+        $networks = [];
+        foreach ($this->tuples as $index => $tuple) {
+            $networks["{$tuple[0]},{$tuple[1]}"] = [
+                'lowestIndex' => $index,
+                'network' => $tuple,
+            ];
+        }
+
+        while (true) {
+            $newNetworks = [];
+            foreach ($networks as $info) {
+                foreach ($this->getComputersConnectedWithAll($info['lowestIndex'], ...$info['network']) as $next => $nextInfo) {
+                    $network = [...$info['network'], $next];
+                    sort($network);
+                    $key = implode(',', $network);
+                    if (isset($newNetworks[$key])) {
+                        $newNetworks[$key]['lowestIndex'] = min($newNetworks[$key]['lowestIndex'], $nextInfo['lowestIndex']);
+                    } else {
+                        $newNetworks[$key] = [
+                            'lowestIndex' => $nextInfo['lowestIndex'],
+                            'network' => $network,
+                        ];
+                    }
+                }
+            }
+
+            if (empty($newNetworks)) {
+                if (current($networks)['lowestIndex'] === 0) {
+                    // We couldn't expand, the previous iteration contains the largest
+                    dump(array_keys($networks));
+                    return array_keys($networks)[0];
+                } else {
+                    // We couldn't expand, retry once with the lowest index reset
+                    // This shouldn't be necessary, just a try from my end to see if this solves my "I get 4 largest networks"
+                    // result
+                    foreach ($networks as &$info) {
+                        $info['lowestIndex'] = 0;
+                    }
+                }
+            } else {
+                $networks = $newNetworks;
+            }
+        }
     }
 
     private function init(PuzzleInput $input): void
@@ -76,18 +125,28 @@ class Day23
     }
 
     /**
-     * @return string[]
+     * @return array<string, array{lowestIndex: int, connections: int}>
      */
-    private function getComputersConnectedWithBoth(string $a, string $b, int $startIndex): array
+    private function getComputersConnectedWithAll(int $startIndex, string ...$connectWithAll): array
     {
         $result = [];
         for ($i = $startIndex; $i < count($this->tuples); $i++) {
-            if (in_array($this->tuples[$i][0], [$a, $b], true)) {
-                $result[$this->tuples[$i][1]] = ($result[$this->tuples[$i][1]] ?? 0) + 1;
-            } elseif (in_array($this->tuples[$i][1], [$a, $b], true)) {
-                $result[$this->tuples[$i][0]] = ($result[$this->tuples[$i][0]] ?? 0) + 1;
+            $aInArray = in_array($this->tuples[$i][0], $connectWithAll, true);
+            $bInArray = in_array($this->tuples[$i][1], $connectWithAll, true);
+            if ($aInArray && !$bInArray) {
+                $new = $this->tuples[$i][1];
+            } elseif ($bInArray && !$aInArray) {
+                $new = $this->tuples[$i][0];
+            } else {
+                continue;
+            }
+
+            if (!isset($result[$new])) {
+                $result[$new] = ['lowestIndex' => $i, 'connections' => 1];
+            } else {
+                $result[$new]['connections']++;
             }
         }
-        return array_keys(array_filter($result, fn(int $connections) => $connections === 2));
+        return array_filter($result, fn(array $data) => $data['connections'] === count($connectWithAll));
     }
 }
